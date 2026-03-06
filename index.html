@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>نظام متابعة العملاء</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>نظام إدارة عملاء مكتب السفر</h1>
+</header>
+
+<section class="add-section">
+<form onsubmit="addClient(event)">
+<input type="text" id="name" placeholder="اسم العميل" required>
+<input type="text" id="phone" placeholder="رقم العميل" required>
+<input type="date" id="clientDate" required>
+<button type="submit">إضافة عميل</button>
+</form>
+</section>
+
+<div class="board">
+
+<div class="column" id="col1">
+<h2>📞 لسه مكلمناه</h2>
+</div>
+
+<div class="column" id="col2">
+<h2>📋 في مرحلة التفاصيل</h2>
+</div>
+
+<div class="column" id="col3">
+<h2>🚀 تم تحديد موعد تنفيذ</h2>
+</div>
+
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
