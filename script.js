@@ -1,8 +1,34 @@
-let clients = JSON.parse(localStorage.getItem("clients")) || [];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-function saveData(){
-    localStorage.setItem("clients", JSON.stringify(clients));
+const firebaseConfig = {
+  apiKey: "AIzaSyB6nMtShH8czQRbsf5MZNUKwmNPMbERPwo",
+  authDomain: "client-keep.firebaseapp.com",
+  projectId: "client-keep",
+  storageBucket: "client-keep.firebasestorage.app",
+  messagingSenderId: "306548341972",
+  appId: "1:306548341972:web:e9bd90a187ee849acacf41",
+  measurementId: "G-LMLCJ18408"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let clients = [];
+
+async function loadClients(){
+
+    clients = [];
+
+    const querySnapshot = await getDocs(collection(db,"clients"));
+
+    querySnapshot.forEach((docItem)=>{
+        clients.push({id:docItem.id,...docItem.data()});
+    });
+
+    renderClients();
 }
+
 function renderClients(){
 
     document.getElementById("col1").innerHTML = "<h2>📞 لسه مكلمناه</h2>";
@@ -21,11 +47,9 @@ function renderClients(){
                 let aAlert = (now - a.lastCall) >= 3*24*60*60*1000;
                 let bAlert = (now - b.lastCall) >= 3*24*60*60*1000;
 
-                // اللي عليه تنبيه يطلع فوق
                 if(aAlert && !bAlert) return -1;
                 if(!aAlert && bAlert) return 1;
 
-                // بعد كده الأقدم في آخر تواصل
                 return a.lastCall - b.lastCall;
             });
 
@@ -34,7 +58,8 @@ function renderClients(){
         });
     }
 }
-function addClient(e){
+
+window.addClient = async function(e){
     e.preventDefault();
 
     let name = document.getElementById("name").value;
@@ -43,18 +68,16 @@ function addClient(e){
 
     let createdTime = new Date(dateInput).getTime();
 
-    let newClient = {
-        name,
-        phone,
-        date: dateInput,
-        created: createdTime,
-        lastCall: createdTime,
-        stage: 1
-    };
+    await addDoc(collection(db,"clients"),{
+        name:name,
+        phone:phone,
+        date:dateInput,
+        created:createdTime,
+        lastCall:createdTime,
+        stage:1
+    });
 
-    clients.push(newClient);
-    saveData();
-    renderClients();
+    loadClients();
     document.querySelector("form").reset();
 }
 
@@ -95,32 +118,52 @@ function createCard(client,index){
     column.appendChild(card);
 }
 
-function moveNext(index){
-    if(clients[index].stage < 3){
-        clients[index].stage++;
-        saveData();
-        renderClients();
+window.moveNext = async function(index){
+
+    let client = clients[index];
+
+    if(client.stage < 3){
+
+        await updateDoc(doc(db,"clients",client.id),{
+            stage: client.stage + 1
+        });
+
+        loadClients();
     }
 }
 
-function moveBack(index){
-    if(clients[index].stage > 1){
-        clients[index].stage--;
-        saveData();
-        renderClients();
+window.moveBack = async function(index){
+
+    let client = clients[index];
+
+    if(client.stage > 1){
+
+        await updateDoc(doc(db,"clients",client.id),{
+            stage: client.stage - 1
+        });
+
+        loadClients();
     }
 }
 
-function removeClient(index){
-    clients.splice(index,1);
-    saveData();
-    renderClients();
+window.removeClient = async function(index){
+
+    let client = clients[index];
+
+    await deleteDoc(doc(db,"clients",client.id));
+
+    loadClients();
 }
 
-function markDone(index){
-    clients[index].lastCall = Date.now();
-    saveData();
-    renderClients();
+window.markDone = async function(index){
+
+    let client = clients[index];
+
+    await updateDoc(doc(db,"clients",client.id),{
+        lastCall: Date.now()
+    });
+
+    loadClients();
 }
 
 function formatTime(ms){
@@ -130,7 +173,9 @@ function formatTime(ms){
 }
 
 setInterval(()=>{
+
     clients.forEach((client,index)=>{
+
         let created = Date.now()-client.created;
         let lastCall = Date.now()-client.lastCall;
 
@@ -142,13 +187,17 @@ setInterval(()=>{
         if(lastEl) lastEl.innerText = formatTime(lastCall);
 
         if(alertEl){
+
             if(lastCall >= 3*24*60*60*1000){
                 alertEl.style.display="block";
             }else{
                 alertEl.style.display="none";
             }
+
         }
+
     });
+
 },1000);
 
-renderClients();
+loadClients();
