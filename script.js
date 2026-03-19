@@ -220,4 +220,4 @@ card.style.display="none";
 
 },1000);
 
-setInterval(loadClients,2000);
+setInterval(loadClients,20000);
