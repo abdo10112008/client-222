@@ -198,6 +198,26 @@ setInterval(()=>{
 
     });
 
+  window.searchClient = function(){
+
+let searchValue = document.getElementById("search").value.toLowerCase();
+
+let cards = document.querySelectorAll(".card");
+
+cards.forEach(card=>{
+
+let text = card.innerText.toLowerCase();
+
+if(text.includes(searchValue)){
+card.style.display="block";
+}else{
+card.style.display="none";
+}
+
+});
+
+}
+
 },1000);
 
 setInterval(loadClients,2000);
