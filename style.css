@@ -107,6 +107,35 @@ form button{
 
 .alert{
     background:#ffb703;
+    /* صندوق البحث */
+
+#search{
+width:90%;
+max-width:500px;
+display:block;
+margin:20px auto;
+padding:12px 15px;
+font-size:15px;
+border-radius:30px;
+border:1px solid #ddd;
+outline:none;
+box-shadow:0 2px 8px rgba(0,0,0,0.08);
+transition:0.3s;
+}
+
+/* لما المستخدم يضغط عليه */
+
+#search:focus{
+border-color:#4e73df;
+box-shadow:0 4px 12px rgba(78,115,223,0.3);
+}
+
+/* placeholder */
+
+#search::placeholder{
+color:#999;
+font-size:14px;
+}
     padding:5px;
     border-radius:5px;
     margin-top:5px;
